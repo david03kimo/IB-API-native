@@ -1,4 +1,4 @@
-# Goal:
+# Goal:AutoTrading
 ## Historical Bar update
 - Historical3k.py:Get historical data and stop.
 - Realtime3k.py:Get historical data and keep update realtime bar.
