@@ -18,7 +18,7 @@ class TestApp(EWrapper,EClient):
         self.data.append([bar.date, bar.open,bar.high,bar.low,bar.close,bar.volume])
         df = pd.DataFrame(self.data,columns=['DateTime','Open','High','Low', 'Close','Volume'])
         df['DateTime'] = pd.to_datetime(df['DateTime'],unit='s') 
-        df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/API_Historical.csv',index=0 ,float_format='%.2f')
+        df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/API_Historical.csv',index=0 ,float_format='%.5f')
 
     def nextValidId(self,orderId):
         self.nextOrderId=orderId
