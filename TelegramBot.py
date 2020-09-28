@@ -29,7 +29,7 @@ class telegram_bot():
 		return json.loads(r.content)
 
 	def webhook(self):
-		url="https://api.telegram.org/bot1232434797:AAFsd_ZaC0SmVTrtp2Irz35d7SJZrpVrRUg/setWebhook?url="
+		url=''
 		request=req.Request(url,headers={})
 with req.urlopen(request) as response:
     data=response.read().decode("utf-8")
