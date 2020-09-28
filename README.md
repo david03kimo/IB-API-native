@@ -10,5 +10,5 @@
 - *todo*
 ## Python trading Robot
 - *todo*
-## Tradingview Alert webhood
-- *todo*
+## Tradingview Alert Telegram
+- *processing*
