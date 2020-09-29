@@ -1,3 +1,6 @@
+'''
+Get historical data and keep update realtime bar
+'''
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
