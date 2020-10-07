@@ -12,4 +12,4 @@
 ## Python trading Robot
 - *todo*
 ## Tradingview Alert Telegram
-- **
+- *todo*
