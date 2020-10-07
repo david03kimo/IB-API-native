@@ -65,30 +65,31 @@ class TestApp(EWrapper,EClient):
         df2['DateTime'] = pd.to_datetime(df2['DateTime'],unit='s') 
         df2=df2.set_index('DateTime')
         
+        # q=datetime(2020,10,1,1,1,1,tzinfo=timezone.utc)
+        # q=self.tz_native(q)
         
-        q=datetime(2020,10,1,1,1,1,tzinfo=timezone.utc)
-        q=self.tz_native(q)
         now=datetime.utcnow()
         minutes=now.minute
         remainder=minutes%self.period
+        quotient=minutes//self.period
         
         if remainder==0 : 
-            minutes=minutes-remainder
-            end = now.replace(minute=minutes)
-            start = end - timedelta(seconds=self.period * 60)
-            start=self.tz_native(start)
-            end=self.tz_native(end)
-            if start-q>timedelta(minutes=self.period):
-                res_df=df1[start:end].resample('3min', closed='left', label='left').agg(self.res_dict)
-                print('res_df:',res_df)
-                q=start
-                # res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/res3K_HistoricalUpdate.csv',float_format='%.5f')
+            res_df=df1.resample('3min', closed='left', label='left').agg(self.res_dict)
+            print(res_df)
+            res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/res3K_HistoricalUpdate.csv',float_format='%.5f')
+
+            #flag=0 if quotient=19 else quotient+1
+            # minutes=minutes-remainder
+            # end = now.replace(minute=minutes)
+            # start = end - timedelta(seconds=self.period * 60)
+            # start=self.tz_native(start)
+            # end=self.tz_native(end)
 
         df1.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_HistoricalUpdate.csv' ,float_format='%.5f')
         #df2.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K1_Historical.csv',index=0 ,float_format='%.5f')
 
     def tz_native(self,t):
-        return datetime(t.year,t.month,t.day,t.hour,t.minute)
+        return datetime(t.year,t.month,t.day,t.hour,t.minute,t.second)
         
     def nextValidId(self,orderId):
         self.nextOrderId=orderId
