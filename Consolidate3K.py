@@ -1,5 +1,5 @@
 '''
-Under construction
+Resample the stream tick snapshot data every 3 mins to 3m K
 '''
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
@@ -17,7 +17,6 @@ class TestApp(EWrapper,EClient):
         EClient.__init__(self,self)
         self.data = [] #Historical
         self.data1 = [] #Update
-        self.data2=[] #temp
         self.period=3 #3m K
         # resample method dictionary
         self.res_dict = {
@@ -27,20 +26,16 @@ class TestApp(EWrapper,EClient):
             'Close': 'last',
             'Volume': 'sum'
             }
+        self.now_date=0
+        self.pre_date=0
 
     def error(self,reqId,errorCode,errorString):
         print('Error: ',reqId,' ',errorCode,' ',errorString)
 
     def historicalData(self,reqId,bar):
-        # print(f'Time: {bar.date} Open:{bar.open} High:{bar.high} Low:{bar.low} Close: {bar.close} Volume: {bar.volume}')
-        #self.df=pd.DataFrame(self.df,columns=['DateTime','Open','High','Low', 'Close','Volume'])
-        #self.df.append([bar.date, bar.open,bar.high,bar.low,bar.close,bar.volume])
-        #self.df['DateTime'] = pd.to_datetime(self.df['DateTime'],unit='s') 
-        
         self.data.append([bar.date, bar.open,bar.high,bar.low,bar.close,bar.volume])
         df = pd.DataFrame(self.data,columns=['DateTime','Open','High','Low', 'Close','Volume'])
         df['DateTime'] = pd.to_datetime(df['DateTime'],unit='s') 
-        
         df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_Historical.csv',index=0 ,float_format='%.5f')
 
 
@@ -49,44 +44,24 @@ class TestApp(EWrapper,EClient):
         print('-------------------------------------------------------------------------------------------------------------')
         print("HistoricalDataEnd. ReqId:", reqId, "from", start, "to", end)
         print('-------------------------------------------------------------------------------------------------------------')
-        #self.df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_Historical.csv',index=0 ,float_format='%.2f')
 
     def historicalDataUpdate(self, reqId: int, bar):
-        # print(f'Time: {bar.date} Open:{bar.open} High:{bar.high} Low:{bar.low} Close: {bar.close} Volume: {bar.volume}')
-        #self.df.append([bar.date, bar.open,bar.high,bar.low,bar.close,bar.volume])
-        #self.df['DateTime'] = pd.to_datetime(self.df['DateTime'],unit='s') 
-        #self.df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_Historical.csv',index=0 ,float_format='%.2f')
-
-        self.data1.append([bar.date, bar.open,bar.high,bar.low,bar.close,bar.volume])
+        self.data1.append([bar.date,bar.open,bar.high,bar.low,bar.close,bar.volume])
         df1 = pd.DataFrame(self.data1,columns=['DateTime','Open','High','Low', 'Close','Volume'])
         df1['DateTime'] = pd.to_datetime(df1['DateTime'],unit='s') 
         df1=df1.set_index('DateTime')
-        df2 = pd.DataFrame(self.data2,columns=['DateTime','Open','High','Low', 'Close','Volume'])
-        df2['DateTime'] = pd.to_datetime(df2['DateTime'],unit='s') 
-        df2=df2.set_index('DateTime')
+     
+        #Calculate the bar.date and previous bar.date
+        self.pre_date=self.now_date
+        self.now_date=int(bar.date)
         
-        # q=datetime(2020,10,1,1,1,1,tzinfo=timezone.utc)
-        # q=self.tz_native(q)
-        
-        now=datetime.utcnow()
-        minutes=now.minute
-        remainder=minutes%self.period
-        quotient=minutes//self.period
-        
-        if remainder==0 : 
+        if self.now_date%(self.period*60) ==0 and self.pre_date%(self.period*60)==120 : #Resample once after the bar closed
             res_df=df1.resample('3min', closed='left', label='left').agg(self.res_dict)
-            print(res_df)
+            print('Resampled')
+            res_df.drop(res_df.index[-1], axis=0, inplace=True) #delete the new open bar at lastest appended row
             res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/res3K_HistoricalUpdate.csv',float_format='%.5f')
 
-            #flag=0 if quotient=19 else quotient+1
-            # minutes=minutes-remainder
-            # end = now.replace(minute=minutes)
-            # start = end - timedelta(seconds=self.period * 60)
-            # start=self.tz_native(start)
-            # end=self.tz_native(end)
-
         df1.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_HistoricalUpdate.csv' ,float_format='%.5f')
-        #df2.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K1_Historical.csv',index=0 ,float_format='%.5f')
 
     def tz_native(self,t):
         return datetime(t.year,t.month,t.day,t.hour,t.minute,t.second)
