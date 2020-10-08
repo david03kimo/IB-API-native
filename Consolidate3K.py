@@ -10,7 +10,7 @@ from threading import Timer
 import pandas as pd
 import threading
 import time
-from datetime import datetime, timedelta,tzinfo,timezone
+from datetime import datetime
 
 class TestApp(EWrapper,EClient):
     def __init__(self):
@@ -62,9 +62,6 @@ class TestApp(EWrapper,EClient):
             res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/res3K_HistoricalUpdate.csv',float_format='%.5f')
 
         df1.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_HistoricalUpdate.csv' ,float_format='%.5f')
-
-    def tz_native(self,t):
-        return datetime(t.year,t.month,t.day,t.hour,t.minute,t.second)
         
     def nextValidId(self,orderId):
         self.nextOrderId=orderId
