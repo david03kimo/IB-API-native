@@ -3,7 +3,7 @@ This is for listener for tradingview alerts and call the sendorder function to p
 '''
 
 from flask import Flask, request, abort
-from SendOrder import sendorder
+from SendMarketOrder import sendorder
 import sys
 
 
