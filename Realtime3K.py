@@ -60,7 +60,7 @@ def main():
     app.reqHistoricalData(1,contract,'','1 D','1 min','MIDPOINT',0,1,True,[])
     
     # Call stop() after 3 seconds to disconnect the program
-    Timer(30,app.stop).start()
+    Timer(720,app.stop).start()
     app.run()
 
 if __name__=="__main__":

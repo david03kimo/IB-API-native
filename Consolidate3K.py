@@ -64,7 +64,7 @@ class TestApp(EWrapper,EClient):
             del self.data1[0:len(self.data1)-1]
             res_df.drop(res_df.index[-1], axis=0, inplace=True) #delete the new open bar at lastest appended row
             res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K.csv', mode='a', header=False,float_format='%.5f')
-            print('Resampled',datetime.fromtimestamp(self.now_date-180))
+            print('Resampled',datetime.fromtimestamp(self.now_date-60*self.period))
         # self.df1.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K_HistoricalUpdate.csv' ,float_format='%.5f')
         return
 
