@@ -8,15 +8,14 @@ from ibapi.contract import Contract
 from ibapi.order import *
 from ibapi.ticktype import TickTypeEnum
 from threading import Timer
-
 class TestApp(EWrapper,EClient):
-    def __init__(self,action,price,qty,limit,stop):
+    def __init__(self,signal,entryprice,qty,tp,sl):
         EClient.__init__(self,self)
-        self.action=action
-        self.price=price
+        self.signal=signal
+        self.entryprice=entryprice
         self.qty=qty
-        self.tp=limit
-        self.sl=stop
+        self.tp=tp
+        self.sl=sl
         return
 
     def error(self,reqId,errorCode,errorString):
@@ -60,13 +59,13 @@ class TestApp(EWrapper,EClient):
 
         # Contract
         contract = Contract()
-        contract.symbol = "EUR"
-        contract.secType = "CFD" 
-        contract.currency = "USD"
-        contract.exchange = "SMART" 
+        contract.symbol = 'EUR'
+        contract.secType = 'CFD' 
+        contract.currency = 'USD'
+        contract.exchange = 'SMART' 
 
         # Order
-        bracket = self.BracketOrder(self.nextOrderId(), self.action, self.qty,self.price, self.tp, self.sl)
+        bracket = self.BracketOrder(self.nextOrderId(), self.signal, self.qty, self.entryprice, self.tp, self.sl)
         for o in bracket:
             self.placeOrder(o.orderId, contract, o)
             self.nextOrderId() # need to advance this we’ll skip one extra oid, it’s fine
@@ -82,14 +81,13 @@ class TestApp(EWrapper,EClient):
         return
 
     @staticmethod
-    def BracketOrder(
-        self,
-        parentOrderId:int, 
-        action:str, 
-        quantity:float, 
-        limitPrice:float, 
-        takeProfitLimitPrice:float, 
-        stopLossPrice:float
+    def BracketOrder(self,
+        parentOrderId, #OrderId
+        action,  #'BUY' or 'SELL'
+        quantity,  #quantity of order
+        limitPrice,  # Entry Price
+        takeProfitLimitPrice,  # Exit price
+        stopLossPrice # Stop-loss price
         ):
 
         #This will be our main or “parent” order
@@ -127,8 +125,8 @@ class TestApp(EWrapper,EClient):
         bracketOrder = [parent, takeProfit, stopLoss]
         return bracketOrder
 
-def sendorder(action,price,qty,limit,stop):
-    app=TestApp(action,price,qty,limit,stop)
+def sendorder(signal,price,qty,limit,stop):
+    app=TestApp(signal,price,qty,limit,stop)
     app.nextOrderId=0
     app.connect('127.0.0.1',4002,0)
 
@@ -138,4 +136,4 @@ def sendorder(action,price,qty,limit,stop):
     app.run()
 
 if __name__=="__main__":
-    sendorder()
+    main()
