@@ -123,7 +123,6 @@ class TestApp(EWrapper,EClient):
         #The parent and children orders will need this attribute set to False to prevent accidental executions.
         #The LAST CHILD will have it set to True, 
         parent.transmit = False
-        # print('limitPrice:',limitPrice)
 
         takeProfit = Order()
         takeProfit.orderId = parent.orderId + 1
@@ -133,7 +132,6 @@ class TestApp(EWrapper,EClient):
         takeProfit.lmtPrice = takeProfitLimitPrice
         takeProfit.parentId = parentOrderId
         takeProfit.transmit = False
-        # print('takeProfitLimitPrice:',takeProfitLimitPrice)
 
         stopLoss = Order()
         stopLoss.orderId = parent.orderId + 2
@@ -146,7 +144,6 @@ class TestApp(EWrapper,EClient):
         #In this case, the low side order will be the last child being sent. Therefore, it needs to set this attribute to True 
         #to activate all its predecessors
         stopLoss.transmit = True
-        # print('stopLossPrice:',stopLossPrice)
 
         bracketOrder = [parent, takeProfit, stopLoss]
         print('Parent.TP,SL OrderId:',parent.orderId,takeProfit.orderId,stopLoss.orderId)
