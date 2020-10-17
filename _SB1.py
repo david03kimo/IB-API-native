@@ -1,13 +1,13 @@
-import pandas as pd
-import talib
-from SendBracketOrder import sendorder
+'''
+simulate calculation module
+'''
+
 
 quantity=20807.121237394185
 action='SELL'
-Limit=1.18224
-TakeProfit=1.1815190929687551
-StopLoss=1.1829609070312448
-sendorder(action,Limit,quantity,TakeProfit,StopLoss)
-# print(s,quantity,Limit,TakeProfit,StopLoss)
+Limit=1.1748
+TakeProfit=1.1738
+StopLoss=1.1758
 
-    
+def _SB1():
+    return 'BUY',10000,1.1693,1.1683,1.1703

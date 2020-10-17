@@ -73,7 +73,7 @@ class TestApp(EWrapper,EClient):
             res_df.drop(res_df.index[-1], axis=0, inplace=True) #delete the new open bar at lastest appended row
             res_df.to_csv('/Users/davidliao/Documents/code/Github/MyProject/data/3K.csv', mode='a', header=False,float_format='%.5f')
             print('Resampled',datetime.fromtimestamp(self.now_date-60*self.period))
-            self.signal,self.qty,self.entryprice,self.tp,self.sl=_SB()
+            self.signal,self.qty,self.entryprice,self.tp,self.sl=_SB() # call calculation module to get entry sinal and price. can call _SB1 for test.
             if self.signal != False:
                 self.start()
         return
