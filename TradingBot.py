@@ -163,13 +163,13 @@ class TestApp(EWrapper,EClient):
         self.position =position
         return
 
-    def DataDelay(self):
+    def ifDataDelay(self):
         while True:
             if int(datetime.now().timestamp()) - self.LastReceivedDataTime >30:
                 print('30 sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
                 # app.ifNoData=True
                 raise EOFError
-            break
+                break
         return
 
 def main():
@@ -192,7 +192,7 @@ def main():
     app.run()
 
      # monitor data delay
-    app.DataDelay()
+    app.ifDataDelay()
     print('monitored')
 
 if __name__=="__main__":
