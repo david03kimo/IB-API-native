@@ -169,8 +169,7 @@ class TestApp(EWrapper,EClient):
                 print('30 sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
                 # app.ifNoData=True
                 raise EOFError
-                break
-
+            break
         return
 
 def main():
@@ -193,12 +192,8 @@ def main():
     app.run()
 
      # monitor data delay
-    p = threading.Thread(target = app.DataDelay())
-    p.start() 
+    app.DataDelay()
     print('monitored')
-    p.join()
-    
-    
 
 if __name__=="__main__":
     while True:
@@ -207,8 +202,3 @@ if __name__=="__main__":
                 
         except EOFError as e:
             print('main() error due to :',type(e),e)
-            t = threading.Thread(target = TestApp.stop()) 
-            t.start()
-            t.join()
-            print('restart main()')
-            main()
