@@ -57,7 +57,7 @@ class TestApp(EWrapper,EClient):
         del self.data[-1]
         self.df = pd.DataFrame(self.data,columns=['DateTime','Open','High','Low', 'Close','Volume'])
         self.df['DateTime'] = pd.to_datetime(self.df['DateTime'],unit='s')
-        self.df.to_csv('~/Documents/code/Github/IB native API/data/3K.csv',index=0 ,float_format='%.5f')   
+        # self.df.to_csv('/Users/davidliao/Documents/code/Github/IB-native-API/data/3K.csv',index=0 ,float_format='%.5f')   
         # self.data=[] #清掉是否有助於記憶體的節省？
         super().historicalDataEnd(reqId, start, end)
         print( 'HistoricalDataEnd. ReqId:', reqId, 'from', start, 'to', end)
@@ -76,7 +76,7 @@ class TestApp(EWrapper,EClient):
             res_df=self.df1.resample('3min', closed='left', label='left').agg(self.res_dict)
             del self.data1[0:len(self.data1)-1]
             res_df.drop(res_df.index[-1], axis=0, inplace=True) #delete the new open bar at lastest appended row
-            res_df.to_csv('~/Documents/code/Github/IB native API/data/3K.csv', mode='a', header=False,float_format='%.5f')
+            # res_df.to_csv('/Users/davidliao/Documents/code/Github/IB-native-API/data/3K.csv', mode='a', header=False,float_format='%.5f')
             print('Resampled',datetime.fromtimestamp(self.now_date-60*self.period))
             res_df.reset_index(inplace=True)
             self.df = self.df.append(res_df, ignore_index=False) 
@@ -167,9 +167,9 @@ class TestApp(EWrapper,EClient):
         while True:
             if int(datetime.now().timestamp()) - self.LastReceivedDataTime >30:
                 print('30 sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
-                # app.ifNoData=True
                 raise EOFError
-                break
+            time.sleep(1)
+            
         return
 
 def main():
@@ -187,18 +187,17 @@ def main():
 
     #request historical data
     app.reqHistoricalData(1,contract,'','2 D','3 mins','MIDPOINT',0,2,True,[])
-    
-    
+    t = threading.Thread(target = app.ifDataDelay)
+    t.start()        
     app.run()
-
-     # monitor data delay
-    app.ifDataDelay()
-    print('monitored')
 
 if __name__=="__main__":
     while True:
         try:
             main()
-                
+
         except EOFError as e:
             print('main() error due to :',type(e),e)
+            app=TestApp()
+            app.cancelHistoricalData(1)
+            time.sleep(5)
