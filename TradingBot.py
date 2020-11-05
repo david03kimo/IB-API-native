@@ -44,7 +44,7 @@ class TestApp(EWrapper,EClient):
         return
 
     def error(self,reqId,errorCode,errorString):
-        print('Error: ',reqId,' ',errorCode,' ',errorString)    
+        print(datetime.fromtimestamp(int(datetime.now().timestamp())),'Error: ',reqId,' ',errorCode,' ',errorString)    
         return
 
     def historicalData(self,reqId,bar):
@@ -60,7 +60,7 @@ class TestApp(EWrapper,EClient):
         # self.df.to_csv('/Users/davidliao/Documents/code/Github/IB-native-API/data/3K.csv',index=0 ,float_format='%.5f')   
         # self.data=[] #清掉是否有助於記憶體的節省？
         super().historicalDataEnd(reqId, start, end)
-        print( 'HistoricalDataEnd. ReqId:', reqId, 'from', start, 'to', end)
+        print( datetime.fromtimestamp(int(datetime.now().timestamp())),'HistoricalDataEnd. ReqId:', reqId, 'from', start, 'to', end)
         return
 
     def historicalDataUpdate(self, reqId: int, bar):
@@ -77,7 +77,7 @@ class TestApp(EWrapper,EClient):
             del self.data1[0:len(self.data1)-1]
             res_df.drop(res_df.index[-1], axis=0, inplace=True) #delete the new open bar at lastest appended row
             # res_df.to_csv('/Users/davidliao/Documents/code/Github/IB-native-API/data/3K.csv', mode='a', header=False,float_format='%.5f')
-            print('Resampled',datetime.fromtimestamp(self.now_date-60*self.period))
+            # print('Resampled',datetime.fromtimestamp(self.now_date-60*self.period))
             res_df.reset_index(inplace=True)
             self.df = self.df.append(res_df, ignore_index=False) 
             # self.df.to_csv('~/Documents/code/Github/IB native API/data/df.csv',index=0 ,float_format='%.5f')  
@@ -109,7 +109,6 @@ class TestApp(EWrapper,EClient):
     def stop(self):
         self.done=True
         self.disconnect()
-        print('stop() run')
         return
     
     @staticmethod
@@ -167,28 +166,24 @@ class TestApp(EWrapper,EClient):
         w=180
         while True:
             if int(datetime.now().timestamp()) - self.LastReceivedDataTime >w:
-                print(w,' sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
+                print(datetime.fromtimestamp(int(datetime.now().timestamp())),w,' sec delayed,last receieved:',datetime.fromtimestamp(self.LastReceivedDataTime))
                 self.cancelHistoricalData(1)
-                time.sleep(3)
+                time.sleep(10)
+                self.done=True
                 self.disconnect()
+                time.sleep(10)
                 while True:
                     if not self.isConnected():
-                        print('disconnected')
+                        print(datetime.fromtimestamp(int(datetime.now().timestamp())),'Disconnected')
                         raise EOFError
-                        print('raise EOFError')
-                    time.sleep(3)
-                
+                    time.sleep(10)
+            time.sleep(10)
         return
 
 def main():
     print('main() run')
     app=TestApp()
     app.nextOrderId=0
-    # if app.isConnected():
-    #     print('isConnected')
-        
-    #     # app.connectionClosed
-    #     time.sleep(5)
     # app.connect('127.0.0.1',7497,0) # IB TWS
     app.connect('127.0.0.1',4002,0) # IB Gateway
     
@@ -200,7 +195,8 @@ def main():
 
     #request historical data
     app.reqHistoricalData(1,contract,'','2 D','3 mins','MIDPOINT',0,2,True,[])
-    t = threading.Thread(target = app.ifDataDelay)
+    t = threading.Thread(target = app.ifDataDelay,name='CheckDelay')
+    t.setDaemon(True)
     t.start()        
     app.run()
 
@@ -208,7 +204,8 @@ if __name__=="__main__":
     while True:
         try:
             main()
-
         except EOFError as e:
             print('main() error due to :',type(e),e)
+        time.sleep(10)
+            
             
