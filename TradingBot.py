@@ -164,18 +164,31 @@ class TestApp(EWrapper,EClient):
         return
 
     def ifDataDelay(self):
+        w=180
         while True:
-            if int(datetime.now().timestamp()) - self.LastReceivedDataTime >30:
-                print('30 sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
-                raise EOFError
-            time.sleep(1)
-            
+            if int(datetime.now().timestamp()) - self.LastReceivedDataTime >w:
+                print(w,' sec delay',datetime.fromtimestamp(self.LastReceivedDataTime),datetime.fromtimestamp(int(datetime.now().timestamp())))
+                self.cancelHistoricalData(1)
+                time.sleep(3)
+                self.disconnect()
+                while True:
+                    if not self.isConnected():
+                        print('disconnected')
+                        raise EOFError
+                        print('raise EOFError')
+                    time.sleep(3)
+                
         return
 
 def main():
     print('main() run')
     app=TestApp()
     app.nextOrderId=0
+    # if app.isConnected():
+    #     print('isConnected')
+        
+    #     # app.connectionClosed
+    #     time.sleep(5)
     # app.connect('127.0.0.1',7497,0) # IB TWS
     app.connect('127.0.0.1',4002,0) # IB Gateway
     
@@ -198,6 +211,4 @@ if __name__=="__main__":
 
         except EOFError as e:
             print('main() error due to :',type(e),e)
-            app=TestApp()
-            app.cancelHistoricalData(1)
-            time.sleep(5)
+            
