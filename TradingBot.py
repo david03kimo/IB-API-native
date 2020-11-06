@@ -158,7 +158,7 @@ class TestApp(EWrapper,EClient):
         return bracketOrder
     
     def updatePortfolio(self,contract:Contract,position:float,marketPrice:float,marketValue:float,averageCost:float,unrealizedPNL:float,realizedPNL:float,accountName:str):
-        print('UpdatePortfolio.','Symbol:',contract.symbol,'SecType:',contract.secType,'Exchange:',contract.exchange,'Position:',position,'MarketPrice:',marketPrice,'MarketValue:',marketValue,'AverageCost:',averageCost,'UnrealizedPNL:',unrealizedPNL,'RealizedPNL:',realizedPNL,'AccountName:',accountName)
+        print(datetime.fromtimestamp(int(datetime.now().timestamp())),'UpdatePortfolio.','Symbol:',contract.symbol,'SecType:',contract.secType,'Exchange:',contract.exchange,'Position:',position,'MarketPrice:',marketPrice,'MarketValue:',marketValue,'AverageCost:',averageCost,'UnrealizedPNL:',unrealizedPNL,'RealizedPNL:',realizedPNL,'AccountName:',accountName)
         self.position =position
         return
 
@@ -181,7 +181,7 @@ class TestApp(EWrapper,EClient):
         return
 
 def main():
-    print('main() run')
+    print(datetime.fromtimestamp(int(datetime.now().timestamp())),'main() run')
     app=TestApp()
     app.nextOrderId=0
     # app.connect('127.0.0.1',7497,0) # IB TWS
@@ -205,7 +205,5 @@ if __name__=="__main__":
         try:
             main()
         except EOFError as e:
-            print('main() error due to :',type(e),e)
+            print(datetime.fromtimestamp(int(datetime.now().timestamp())),'main() error due to :',type(e),e)
         time.sleep(10)
-            
-            
