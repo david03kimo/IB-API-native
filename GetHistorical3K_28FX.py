@@ -37,7 +37,7 @@ class TestApp(EWrapper,EClient):
 
         self.FX_df[reqId] = pd.DataFrame(self.FX_df[reqId],columns=['DateTime','Open','High','Low', 'Close','Volume'])
         self.FX_df[reqId]['DateTime'] = pd.to_datetime(self.FX_df[reqId]['DateTime'],unit='s') 
-        self.FX_df[reqId].to_csv('/Users/davidliao/Documents/code/Github/IB-native-API/data/FX_data/'+self.pairs_list[reqId]+'.csv',index=0 ,float_format='%.6f')
+        self.FX_df[reqId].to_csv('/Users/davidliao/Documents/code/Github/Backtest_Python/data/FX_data/'+self.pairs_list[reqId]+'.csv',index=0 ,float_format='%.6f')
         self.count+=1
 
         if self.count==len(self.pairs_list):
