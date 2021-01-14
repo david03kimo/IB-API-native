@@ -9,6 +9,7 @@
 - SendBracketOrder.py:Send the BracketOrder through IB API.
 - PlaceOrder.py & Balance.py:Manully place an order through IB API and check the balance of account for testing purpose.
 - GetHistorical3K_28FX.py:get 28 pairs of FX 1week 3K data.
+- GetHistorical3K_Long.py:get 28 pairs of FX 42weeks 3K data.
 - GetHistorical3K_XAUUSD.py:get gold 1 week 3k data.
 - TradingBot.py:My first Python trading Robot auto trading through IB API.
 - AllStrategies1.py:Put all indicators and strategies in it for TradingBot to call it or backtest to call it.
