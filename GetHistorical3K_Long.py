@@ -22,28 +22,40 @@ class TestApp(EWrapper,EClient):
         self.count=0
         self.PairsCount=0
         self.QueryTime=''
-        self.MaxReq=41 # max numbers of weeks to get
+        # self.MaxReq=41 # max numbers of weeks to get
         self.ifPlot= True
-        self.path='/Users/davidliao/Documents/code/Github/Backtest_Python/data/TF'
+        self.path='/Users/davidliao/Documents/code/Python/Backtest_Python/data/TF'
         self.FX_df={}
         for pair in range(len(self.pairs_list)):
             self.FX_df[pair]={}
-            for count in range(self.MaxReq+1):
-                self.FX_df[pair][count]=[]
+            self.FX_df[pair][0]=[]
         return
 
     def error(self,reqId,errorCode,errorString):
         if errorCode == 366 and self.PairsCount<len(self.pairs_list):
             self.start()
         elif errorCode == 366 and self.PairsCount==len(self.pairs_list):
+            print(datetime.fromtimestamp(int(datetime.now().timestamp())),'over(366)')
             self.stop()
         
-        if errorCode == 162:
-            print('errorCode 162')
-            self.stop()
+        if errorCode == 162 and self.PairsCount<len(self.pairs_list):
+            for i in range(self.count-2,-1,-1):
+                self.FX_df[self.PairsCount][self.count-1]=self.FX_df[self.PairsCount][self.count-1].append(self.FX_df[self.PairsCount][i],ignore_index=True)
+            
+            self.FX_df[self.PairsCount][self.count-1].to_csv(self.path+'/'+self.pairs_list[self.PairsCount]+'.csv',index=0 ,float_format='%.6f')
+            
+            self.PairsCount+=1
+            self.count=0
+            self.QueryTime=''
+            if self.PairsCount <len(self.pairs_list):
+                self.start()
+            else:
+                print(datetime.fromtimestamp(int(datetime.now().timestamp())),self.pairs_list,'Get Data Process Over.')
+                self.stop()
 
+            
         if errorCode != 366:
-            print('Error: ',reqId,' ',errorCode,' ',errorString)
+            print(datetime.fromtimestamp(int(datetime.now().timestamp())),'Error: ',reqId,' ',errorCode,' ',errorString)
         return
 
     def historicalData(self,reqId,bar):
@@ -52,7 +64,7 @@ class TestApp(EWrapper,EClient):
 
     def historicalDataEnd(self, reqId, start: str, end: str):
         super().historicalDataEnd(reqId, start, end)
-        print('Pair:',self.pairs_list[self.PairsCount],' HistoricalDataEnd. ReqId:', reqId, 'from', start, 'to', end)
+        print(datetime.fromtimestamp(int(datetime.now().timestamp())),'Pair:',self.pairs_list[self.PairsCount],' HistoricalDataEnd. ReqId:', reqId, 'from', start, 'to', end)
         self.cancelHistoricalData(reqId)
         self.FX_df[self.PairsCount][reqId] = pd.DataFrame(self.FX_df[self.PairsCount][reqId],columns=['DateTime','Open','High','Low', 'Close','Volume'])
         self.FX_df[self.PairsCount][reqId]['DateTime'] = pd.to_datetime(self.FX_df[self.PairsCount][reqId]['DateTime'],unit='s') 
@@ -61,15 +73,7 @@ class TestApp(EWrapper,EClient):
         self.QueryTime=datetime.strftime(self.FX_df[self.PairsCount][reqId]['DateTime'][0],'%Y%m%d %H:%M:%S GMT')
         self.count+=1
         self.FX_df[self.PairsCount][self.count]=[]
-        if reqId == self.MaxReq:
-            for i in range(reqId-1,-1,-1):
-                self.FX_df[self.PairsCount][reqId]=self.FX_df[self.PairsCount][reqId].append(self.FX_df[self.PairsCount][i],ignore_index=True)
-            
-            self.FX_df[self.PairsCount][reqId].to_csv(self.path+'/'+self.pairs_list[self.PairsCount]+'.csv',index=0 ,float_format='%.6f')
-            
-            self.PairsCount+=1
-            self.count=0
-            self.QueryTime=''
+        
         return
         
     def start(self):
