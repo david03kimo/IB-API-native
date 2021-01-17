@@ -1,5 +1,5 @@
 '''
-Get 28 pairs of FX 3m data about 10 month.(max from IB)
+Get 28 pairs of FX 3m data about 13 year till no data provided from IB
 '''
 
 from ibapi.client import EClient
@@ -17,14 +17,15 @@ import matplotlib.style
 class TestApp(EWrapper,EClient):
     def __init__(self):
         EClient.__init__(self,self)
-        self.pairs_list=['AUDCAD']
+        # self.pairs_list=['AUDCAD']
+        # self.pairs_list=['AUDJPY']
+        self.pairs_list=['CADCHF','CADJPY','CHFJPY','EURAUD','EURCAD','EURCHF','EURGBP','EURJPY','EURNZD','EURUSD','GBPAUD','GBPCAD','GBPCHF','GBPJPY','GBPNZD','GBPUSD','NZDCAD','NZDCHF','NZDJPY','NZDUSD','USDCAD','USDCHF','USDJPY']
         # self.pairs_list=['AUDCAD','AUDCHF','AUDJPY','AUDNZD','AUDUSD','CADCHF','CADJPY','CHFJPY','EURAUD','EURCAD','EURCHF','EURGBP','EURJPY','EURNZD','EURUSD','GBPAUD','GBPCAD','GBPCHF','GBPJPY','GBPNZD','GBPUSD','NZDCAD','NZDCHF','NZDJPY','NZDUSD','USDCAD','USDCHF','USDJPY']
         self.count=0
         self.PairsCount=0
         self.QueryTime=''
-        # self.MaxReq=41 # max numbers of weeks to get
         self.ifPlot= True
-        self.path='/Users/davidliao/Documents/code/Python/Backtest_Python/data/TF'
+        self.path='/Users/davidliao/Documents/code/Python/Backtest/data/TF'
         self.FX_df={}
         for pair in range(len(self.pairs_list)):
             self.FX_df[pair]={}
@@ -41,8 +42,10 @@ class TestApp(EWrapper,EClient):
         if errorCode == 162 and self.PairsCount<len(self.pairs_list):
             for i in range(self.count-2,-1,-1):
                 self.FX_df[self.PairsCount][self.count-1]=self.FX_df[self.PairsCount][self.count-1].append(self.FX_df[self.PairsCount][i],ignore_index=True)
+                self.FX_df[self.PairsCount][i]=[] #  release RAM
             
             self.FX_df[self.PairsCount][self.count-1].to_csv(self.path+'/'+self.pairs_list[self.PairsCount]+'.csv',index=0 ,float_format='%.6f')
+            self.FX_df[self.PairsCount][self.count-1]=[] #  release RAM
             
             self.PairsCount+=1
             self.count=0
@@ -54,7 +57,7 @@ class TestApp(EWrapper,EClient):
                 self.stop()
 
             
-        if errorCode != 366:
+        if errorCode != 366 and errorCode != 162:
             print(datetime.fromtimestamp(int(datetime.now().timestamp())),'Error: ',reqId,' ',errorCode,' ',errorString)
         return
 
